@@ -3,21 +3,26 @@
 #define V_REF 3.3       // Tegangan referensi ADC dalam Volt
 #define VOLTAGE_DIVIDER_RATIO 2.0  // Rasio pembagi tegangan (2:1)
 
+//Fungsi Setup Awal//
 void setup() {
   Serial.begin(9600);  // Inisialisasi komunikasi Serial
   analogReadResolution(12);  // Mengatur resolusi pembacaan ADC menjadi 12 bit (0-4095)
 }
 
+
+//Fungsi membaca nilai mentah ADC//
 int readADCRaw() {
   return analogRead(BATTERY_PIN);  // Membaca nilai raw dari ADC
 }
 
+//Fungsi mengkonversi nilai ADC ke tegangan//
 float getBatteryVoltage() {
   int rawADC = readADCRaw();
   float voltage = (rawADC / (float)ADC_MAX) * V_REF * VOLTAGE_DIVIDER_RATIO;  // Konversi nilai ADC ke tegangan
   return voltage;
 }
 
+//Fungsi mendapatkan persentase dari nilai tegangan//
 int getBatteryPercentage(float voltage) {
   if (voltage >= 4.2) {
     return 100;
@@ -28,6 +33,7 @@ int getBatteryPercentage(float voltage) {
   }
 }
 
+//Fungsi melooping semua fungsi dan menunjukkan nilai persentase batre dan tegangan di seria monitor//
 void loop() {
   float voltage = getBatteryVoltage();
   int percentage = getBatteryPercentage(voltage);
