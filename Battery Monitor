@@ -1,0 +1,42 @@
+#define BATTERY_PIN 34  // Menggunakan GPIO34 sebagai pin ADC
+#define ADC_MAX 4095    // Nilai maksimum dari ADC 12-bit
+#define V_REF 3.3       // Tegangan referensi ADC dalam Volt
+#define VOLTAGE_DIVIDER_RATIO 2.0  // Rasio pembagi tegangan (2:1)
+
+void setup() {
+  Serial.begin(9600);  // Inisialisasi komunikasi Serial
+  analogReadResolution(12);  // Mengatur resolusi pembacaan ADC menjadi 12 bit (0-4095)
+}
+
+int readADCRaw() {
+  return analogRead(BATTERY_PIN);  // Membaca nilai raw dari ADC
+}
+
+float getBatteryVoltage() {
+  int rawADC = readADCRaw();
+  float voltage = (rawADC / (float)ADC_MAX) * V_REF * VOLTAGE_DIVIDER_RATIO;  // Konversi nilai ADC ke tegangan
+  return voltage;
+}
+
+int getBatteryPercentage(float voltage) {
+  if (voltage >= 4.2) {
+    return 100;
+  } else if (voltage <= 3.0) {
+    return 0;
+  } else {
+    return (voltage - 3.0) * 100 / (4.2 - 3.0);
+  }
+}
+
+void loop() {
+  float voltage = getBatteryVoltage();
+  int percentage = getBatteryPercentage(voltage);
+  
+  Serial.print("Battery Voltage: ");
+  Serial.print(voltage);
+  Serial.print(" V, Battery Percentage: ");
+  Serial.print(percentage);
+  Serial.println(" %");
+
+  delay(1000);  // Tunggu 1 detik sebelum membaca kembali
+}
